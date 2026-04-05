@@ -245,7 +245,7 @@
                 <h3>MCP &mdash; Model Context Protocol</h3>
                 <p class="definition">An open standard that lets AI models connect to external tools, data sources, and services in a secure, standardized way. Each <strong>MCP server</strong> exposes a set of capabilities — like querying BigQuery, reading Jira tickets, or searching internal docs — that the AI can call during a conversation.</p>
                 <div class="analogy"><strong>Analogy:</strong> MCPs are like universal power adapters. The AI is your device; MCP servers are adapters that let it plug into anything — BigQuery, Jira, GitHub, Slack, dbt Cloud — without custom wiring for each connection.</div>
-                <p class="tech-note">Active MCP servers: BigQuery (querying), Glean (internal search), Atlassian (Jira + Confluence). The AI can call these tools mid-conversation to retrieve live data.</p>
+                <p class="tech-note">Active MCP servers: Data Concierge (data discovery), BigQuery (querying), Glean (internal search), Atlassian (Jira + Confluence). The AI can call these tools mid-conversation to retrieve live data.</p>
             </div>
 
             <div class="card skill" id="card-skill">
@@ -329,7 +329,7 @@
                     <tr>
                         <td><div class="concept-cell"><div class="concept-dot" style="background:var(--mcp)"></div><span class="concept-name">MCP</span></div></td>
                         <td><div class="use-case-text">Connect Claude to Jira to pull sprint data and generate status updates; connect to Glean to surface relevant internal docs when drafting strategy.</div><div class="use-case-example">"Summarize all open P0 bugs from our Jira board and draft an executive status update."</div></td>
-                        <td><div class="use-case-text">Use the DataConcierge MCP to discover which canonical tables to use; use the BigQuery MCP to run queries and explore results without leaving the conversation.</div><div class="use-case-example">"What tables should I use for conversion rate analysis? Now query the top 5 markets."</div></td>
+                        <td><div class="use-case-text">Use the Data Concierge MCP to discover which canonical tables to use; use the BigQuery MCP to run queries and explore results without leaving the conversation.</div><div class="use-case-example">"What tables should I use for conversion rate analysis? Now query the top 5 markets."</div></td>
                         <td><div class="use-case-text">Connect to DataHub or dbt Cloud MCP servers to inspect pipeline lineage, schema metadata, and downstream impact during debugging or planning.</div><div class="use-case-example">"Show me all downstream tables affected if I rename a column in visits_daily."</div></td>
                         <td><div class="use-case-text">Connect to MLflow or experiment tracking MCP servers to analyze run history; use DataHub MCP to understand feature provenance and data freshness.</div><div class="use-case-example">"Compare my last 10 training runs and identify which hyperparameter drove the best F1."</div></td>
                     </tr>
