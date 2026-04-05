@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Concepts</title>
+    <style>
+        :root {
+            --orange: #F56400;
+            --orange-light: #FFF3EA;
+            --dark: #1a1a2e;
+            --medium: #2d2d44;
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --white: #ffffff;
+            --bg: #f7f8fa;
+            --llm: #7C3AED;
+            --agent: #0EA5E9;
+            --subagent: #06B6D4;
+            --skill: #059669;
+            --mcp: #D97706;
+            --cli: #DC2626;
+            --workflow: #DB2777;
+        }
+        html { scroll-behavior: smooth; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        code { font-family: 'SF Mono','Fira Code','Menlo',monospace; background: #f1f5f9; padding: 0.1em 0.4em; border-radius: 4px; font-size: 0.85em; color: #374151; }
+
+        /* ── Top nav ── */
+        .top-nav {
+            background: var(--dark);
+            padding: 0 2.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            height: 56px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+            gap: 0;
+        }
+        .top-nav .logo { color: var(--white); font-weight: 700; font-size: 1rem; margin-right: auto; white-space: nowrap; }
+        .top-nav .logo span { color: var(--orange); }
+        .share-btn { display: flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: rgba(255,255,255,0.85); font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.9rem; cursor: pointer; transition: background 0.2s, border-color 0.2s; white-space: nowrap; }
+        .share-btn:hover { background: rgba(245,100,0,0.3); border-color: var(--orange); color: #fff; }
+        .share-btn.copied { background: rgba(5,150,105,0.3); border-color: #10b981; color: #fff; }
+
+        /* ── Tab bar ── */
+        .tab-bar {
+            display: flex;
+            background: #12122a;
+            border-bottom: 2px solid #0d0d20;
+            padding: 0 2.5rem;
+            position: sticky;
+            top: 56px;
+            z-index: 190;
+        }
+        .tab-btn {
+            padding: 0.85rem 1.5rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            border: none;
+            background: none;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: color 0.2s, border-color 0.2s;
+            white-space: nowrap;
+        }
+        .tab-btn:hover { color: rgba(255,255,255,0.8); }
+        .tab-btn.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+        /* ── Tab content ── */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ── Hero ── */
+        .hero { background: linear-gradient(140deg, var(--dark) 0%, #16213e 60%, #0f3460 100%); color: white; padding: 4rem 2.5rem 3.5rem; text-align: center; }
+        .hero h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.02em; }
+        .hero h1 span { color: var(--orange); }
+        .hero p { font-size: 1.05rem; opacity: 0.8; max-width: 720px; margin: 0 auto 1.5rem; }
+        .hero-pills { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .hero-pill { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 100px; padding: 0.3rem 1rem; font-size: 0.8rem; font-weight: 500; color: rgba(255,255,255,0.9); text-decoration: none; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+        .hero-pill:hover { background: rgba(245,100,0,0.35); border-color: var(--orange); color: #fff; }
+        .hero .meta { font-size: 0.8rem; opacity: 0.4; }
+
+        /* ── Section ── */
+        .section { padding: 3.5rem 2.5rem; max-width: 1440px; margin: 0 auto; scroll-margin-top: 112px; }
+        .card { scroll-margin-top: 128px; }
+        .section-header { margin-bottom: 2.5rem; }
+        .section-title { font-size: 1.5rem; font-weight: 700; color: var(--dark); margin-bottom: 0.4rem; }
+        .section-subtitle { color: var(--text-light); font-size: 0.95rem; }
+        .section-title a.anchor-link { color: #94a3b8; text-decoration: none; font-size: 0.8em; margin-left: 0.5rem; opacity: 0; transition: opacity 0.15s; font-weight: 400; }
+        .section-title:hover a.anchor-link { opacity: 1; }
+
+        /* ── Concept Cards ── */
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(370px, 1fr)); gap: 1.5rem; }
+        .card { background: var(--white); border-radius: 14px; padding: 1.75rem; border: 1px solid var(--border); box-shadow: 0 1px 6px rgba(0,0,0,0.05); position: relative; overflow: hidden; transition: box-shadow 0.2s, transform 0.2s; }
+        .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
+        .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .card.llm::before    { background: var(--llm); }
+        .card.agent::before  { background: var(--agent); }
+        .card.sub::before    { background: var(--subagent); }
+        .card.skill::before  { background: var(--skill); }
+        .card.mcp::before    { background: var(--mcp); }
+        .card.cli::before    { background: var(--cli); }
+        .card.workflow::before { background: var(--workflow); }
+        .card-badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 100px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: white; margin-bottom: 1rem; }
+        .card.llm    .card-badge { background: var(--llm); }
+        .card.agent  .card-badge { background: var(--agent); }
+        .card.sub    .card-badge { background: var(--subagent); }
+        .card.skill  .card-badge { background: var(--skill); }
+        .card.mcp    .card-badge { background: var(--mcp); }
+        .card.cli    .card-badge { background: var(--cli); }
+        .card.workflow .card-badge { background: var(--workflow); }
+        .card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--dark); }
+        .card .definition { font-size: 0.92rem; color: var(--text); margin-bottom: 1rem; }
+        .card .analogy { background: var(--bg); border-radius: 8px; padding: 0.8rem 1rem; font-size: 0.85rem; color: var(--text-light); border-left: 3px solid #cbd5e0; margin-bottom: 1rem; }
+        .card .analogy strong { color: var(--text); }
+        .card .tech-note { font-size: 0.8rem; color: #94a3b8; font-style: italic; border-top: 1px solid var(--border); padding-top: 0.75rem; }
+
+        /* ── Hierarchy ── */
+        .hierarchy-box { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 2.5rem; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+        .h-row { display: flex; align-items: center; gap: 1.5rem; padding: 0.75rem 0; }
+        .h-label { width: 130px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; text-align: right; flex-shrink: 0; }
+        .h-items { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+        .h-pill { padding: 0.45rem 1.1rem; border-radius: 100px; font-size: 0.8rem; font-weight: 600; color: white; }
+        .h-connector-line { border-left: 2px dashed #e2e8f0; height: 20px; margin-left: calc(130px + 1.5rem + 8px); }
+        .h-connector-text { padding-left: calc(130px + 1.5rem + 8px); font-size: 0.78rem; color: #94a3b8; font-style: italic; }
+
+        /* ── Tables ── */
+        .table-wrapper { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 0.875rem; }
+        thead tr { background: var(--dark); color: white; }
+        th { padding: 0.9rem 1.1rem; text-align: left; font-weight: 600; font-size: 0.75rem; letter-spacing: 0.07em; text-transform: uppercase; }
+        td { padding: 1rem 1.1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: #fafbfc; }
+        .concept-cell { display: flex; align-items: center; gap: 0.6rem; }
+        .concept-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .concept-name { font-weight: 700; font-size: 0.82rem; color: var(--dark); }
+        .use-case-text { font-size: 0.875rem; color: var(--text); }
+        .use-case-example { font-size: 0.8rem; color: var(--text-light); font-style: italic; background: var(--bg); border-radius: 6px; padding: 0.4rem 0.7rem; margin-top: 0.4rem; }
+
+        /* ── Engagement badges ── */
+        .eng-table th { text-align: center; }
+        .eng-table th:first-child { text-align: left; width: 170px; }
+        .eng-table td { text-align: center; vertical-align: middle; }
+        .eng-table td:first-child { text-align: left; font-weight: 600; font-size: 0.85rem; color: var(--dark); }
+        .badge-eng { display: inline-flex; align-items: center; padding: 0.25rem 0.7rem; border-radius: 100px; font-size: 0.75rem; font-weight: 700; }
+        .badge-high { background: #d1fae5; color: #065f46; }
+        .badge-med  { background: #fef3c7; color: #92400e; }
+        .badge-low  { background: #ffedd5; color: #9a3412; }
+        .badge-none { background: #f3f4f6; color: #6b7280; }
+        .badge-flag { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+        /* ── Feedback panel ── */
+        .feedback-panel { background: var(--white); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+        .feedback-header { background: #1e3a5f; color: white; padding: 1rem 1.5rem; font-weight: 700; font-size: 0.95rem; }
+        .feedback-item { display: grid; grid-template-columns: 220px 90px 90px 1fr; gap: 1rem; align-items: start; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+        .feedback-item:last-child { border-bottom: none; }
+        .feedback-item:nth-child(even) { background: #fafbfc; }
+        .feedback-col-headers { display: grid; grid-template-columns: 220px 90px 90px 1fr; gap: 1rem; padding: 0.6rem 1.5rem; background: #f8f9fa; border-bottom: 1px solid var(--border); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #94a3b8; }
+        .fi-cell { font-weight: 600; color: var(--dark); }
+        .fi-rationale { color: var(--text-light); line-height: 1.5; }
+        .fi-rationale strong { color: var(--text); }
+        .fi-add { color: #059669; font-weight: 700; }
+        .fi-structural { color: #7c3aed; font-weight: 700; }
+
+        /* Footer */
+        footer { background: var(--dark); color: rgba(255,255,255,0.45); text-align: center; padding: 2.5rem; font-size: 0.82rem; }
+        footer strong { color: var(--orange); }
+
+        @media (max-width: 900px) {
+            .hero h1 { font-size: 1.8rem; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .section { padding: 2rem 1.25rem; }
+            .feedback-item { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top nav -->
+<div class="top-nav">
+    <span class="logo">Agentic Analytics <span>Dashboard</span></span>
+    <button class="share-btn" onclick="copyShareLink(this)" title="Copy shareable link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share
+    </button>
+</div>
+
+<!-- Tab bar -->
+<div class="tab-bar">
+    <button class="tab-btn active">AI Concepts</button>
+</div>
+
+<!-- ████████████████████ TAB 1: AI Concepts ████████████████████ -->
+<div id="tab1" class="tab-panel active">
+
+    <div class="hero">
+        <h1>AI Concepts <span>Demystified</span></h1>
+        <p>A reference guide cutting through the jargon — plain-language definitions for every major AI concept, plus concrete use cases mapped to your role.</p>
+        <div class="hero-pills">
+            <a class="hero-pill" href="#card-llm">LLM</a>
+            <a class="hero-pill" href="#card-agent">Agent</a>
+            <a class="hero-pill" href="#card-sub">Sub-agent</a>
+            <a class="hero-pill" href="#card-skill">Skill</a>
+            <a class="hero-pill" href="#card-mcp">MCP</a>
+            <a class="hero-pill" href="#card-cli">CLI</a>
+            <a class="hero-pill" href="#card-workflow">Agentic Workflow</a>
+        </div>
+        <div class="meta">Internal AI Strategy Reference &nbsp;&bull;&nbsp; Updated March 2026</div>
+    </div>
+
+    <!-- Glossary -->
+    <div class="section" id="glossary">
+        <div class="section-header">
+            <div class="section-title">Concept Glossary <a class="anchor-link" href="#glossary">#</a></div>
+            <div class="section-subtitle">Seven terms, seven plain-language definitions — with analogies to make them stick and technical notes for the curious.</div>
+        </div>
+        <div class="cards-grid">
+
+            <div class="card llm" id="card-llm">
+                <span class="card-badge">Foundation</span>
+                <h3>LLM &mdash; Large Language Model</h3>
+                <p class="definition">An AI system trained on massive amounts of text to understand, generate, and reason about language. It is the core "reasoning engine" behind virtually every modern AI tool — the model you are actually talking to when you use Claude, ChatGPT, or Gemini.</p>
+                <div class="analogy"><strong>Analogy:</strong> Think of an LLM as a consultant who has read virtually everything ever written. They can answer questions, draft documents, explain concepts, and reason through problems — but they need you to bring context and ask good questions.</div>
+                <p class="tech-note">Examples: Claude (Anthropic), GPT-4o (OpenAI), Gemini (Google). An LLM alone is stateless — no memory between conversations, no ability to take actions unless you layer tools on top.</p>
+            </div>
+
+            <div class="card cli" id="card-cli">
+                <span class="card-badge">Interface</span>
+                <h3>CLI &mdash; Command Line Interface</h3>
+                <p class="definition">A text-based tool you run in a terminal to interact with software. In AI contexts, a CLI like <strong>Claude Code</strong> lets you have a conversation with an AI model while it can also read your local files, run commands, and make changes to your system — far more powerful than a browser-based chat window.</p>
+                <div class="analogy"><strong>Analogy:</strong> If the LLM is the consultant, the CLI is the private office where you meet. No middleman, no GUI overhead — just you, the model, and full access to your machine and connected tools.</div>
+                <p class="tech-note">Claude Code is Anthropic's CLI. It gives Claude direct access to your file system, shell, and any connected MCP servers — enabling it to act as a true coding and analysis partner, not just a chat assistant.</p>
+            </div>
+
+            <div class="card mcp" id="card-mcp">
+                <span class="card-badge">Protocol / Integration</span>
+                <h3>MCP &mdash; Model Context Protocol</h3>
+                <p class="definition">An open standard that lets AI models connect to external tools, data sources, and services in a secure, standardized way. Each <strong>MCP server</strong> exposes a set of capabilities — like querying BigQuery, reading Jira tickets, or searching internal docs — that the AI can call during a conversation.</p>
+                <div class="analogy"><strong>Analogy:</strong> MCPs are like universal power adapters. The AI is your device; MCP servers are adapters that let it plug into anything — BigQuery, Jira, GitHub, Slack, dbt Cloud — without custom wiring for each connection.</div>
+                <p class="tech-note">Active MCP servers: DataConcierge (data discovery), BigQuery (querying), Glean (internal search), Atlassian (Jira + Confluence). The AI can call these tools mid-conversation to retrieve live data.</p>
+            </div>
+
+            <div class="card skill" id="card-skill">
+                <span class="card-badge">Reusable Capability</span>
+                <h3>Skill</h3>
+                <p class="definition">A predefined, reusable instruction set — or prompt template — that encodes how to do a specific task well. Skills are invoked like slash commands (e.g., <code>/generate-dbt-model</code> or <code>/summarize-pr</code>) and give the AI expert-level context for that task without the user having to explain it every time.</p>
+                <div class="analogy"><strong>Analogy:</strong> Skills are like Standard Operating Procedures. Instead of explaining from scratch how to conduct a code review or write a PRD every time, you encode the best approach once — and anyone can invoke it consistently.</div>
+                <p class="tech-note">In Claude Code, skills are defined in <code>CLAUDE.md</code> or as custom slash commands. They can encode team conventions, reference specific tools, and set output format expectations — making expert behavior repeatable.</p>
+            </div>
+
+            <div class="card agent" id="card-agent">
+                <span class="card-badge">Autonomous Actor</span>
+                <h3>Agent</h3>
+                <p class="definition">An AI system that goes beyond answering questions — it can <em>take actions</em>, use tools, make decisions, and work toward a goal autonomously over multiple steps. An agent combines an LLM with tools (via MCP), memory, and a feedback loop so it can plan, execute, self-correct, and iterate.</p>
+                <div class="analogy"><strong>Analogy:</strong> If an LLM is a consultant you ask questions, an agent is a consultant you hand a project to. They scope the work, use their tools, check their own results, and come back when done — without you directing every single step.</div>
+                <p class="tech-note">Key properties: autonomy, tool use, goal-orientation, and error recovery. Claude Code in agentic mode is an agent — it can read, write, run tests, search the web, query databases, and iterate on your behalf.</p>
+            </div>
+
+            <div class="card sub" id="card-sub">
+                <span class="card-badge">Specialized Actor</span>
+                <h3>Sub-agent</h3>
+                <p class="definition">An agent that operates within a larger agentic system, handling a specific, scoped piece of a bigger task. An <strong>orchestrator agent</strong> breaks work into pieces and delegates each piece to a sub-agent specialized for that domain. Sub-agents run independently and report results back.</p>
+                <div class="analogy"><strong>Analogy:</strong> Like a project team. The orchestrator is the project manager who breaks down work. Sub-agents are the specialists: one pulls data, one runs analysis, one writes the narrative. Each is capable on their own, but they operate under a common plan.</div>
+                <p class="tech-note">In Claude Code, the Task tool launches sub-agents: "Explore" for codebase search, "Bash" for terminal commands, "Plan" for architecture decisions. Each runs in an isolated context with its own tool access.</p>
+            </div>
+
+            <div class="card workflow" id="card-workflow">
+                <span class="card-badge">Orchestrated System</span>
+                <h3>Agentic Workflow</h3>
+                <p class="definition">A structured, multi-step process where one or more agents autonomously plan, execute, and adapt to complete a complex end-to-end task. Unlike a single agent interaction, a workflow involves sequencing, parallel execution, conditional branching, and human-in-the-loop checkpoints at critical decision points.</p>
+                <div class="analogy"><strong>Analogy:</strong> An agentic workflow is like a fully automated assembly line for knowledge work. Each station (sub-agent or step) does its part and passes results forward. A human approves key checkpoints before the system takes consequential actions.</div>
+                <p class="tech-note">Typical components: triggering event &rarr; orchestrator &rarr; parallel sub-agents &rarr; tool calls via MCP &rarr; state management &rarr; human review gate &rarr; final output. The key differentiator from a script is the AI's ability to adapt when things go wrong.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Hierarchy -->
+    <div class="section" id="hierarchy">
+        <div class="section-header">
+            <div class="section-title">How These Concepts Build on Each Other <a class="anchor-link" href="#hierarchy">#</a></div>
+            <div class="section-subtitle">Each layer builds on the one below it. Understanding the stack helps you choose the right tool for any given context.</div>
+        </div>
+        <div class="hierarchy-box">
+            <div class="h-row"><div class="h-label">Foundation</div><div class="h-items"><div class="h-pill" style="background:var(--llm)">LLM &mdash; the reasoning engine</div></div></div>
+            <div class="h-connector-line"></div><div class="h-connector-text">accessed via &darr;</div><div class="h-connector-line"></div>
+            <div class="h-row"><div class="h-label">Interface</div><div class="h-items"><div class="h-pill" style="background:var(--cli)">CLI (Claude Code)</div><div class="h-pill" style="background:#6b7280">Chat UI (Claude.ai)</div><div class="h-pill" style="background:#374151">API (programmatic)</div></div></div>
+            <div class="h-connector-line"></div><div class="h-connector-text">extended by &darr;</div><div class="h-connector-line"></div>
+            <div class="h-row"><div class="h-label">Capabilities</div><div class="h-items"><div class="h-pill" style="background:var(--mcp)">MCP Servers (BigQuery, Jira, Glean&hellip;)</div><div class="h-pill" style="background:var(--skill)">Skills (reusable task templates)</div></div></div>
+            <div class="h-connector-line"></div><div class="h-connector-text">enables &darr;</div><div class="h-connector-line"></div>
+            <div class="h-row"><div class="h-label">Autonomy</div><div class="h-items"><div class="h-pill" style="background:var(--agent)">Agent &mdash; autonomous, goal-directed</div><div class="h-pill" style="background:var(--subagent)">Sub-agent &mdash; specialized, delegated</div></div></div>
+            <div class="h-connector-line"></div><div class="h-connector-text">composed into &darr;</div><div class="h-connector-line"></div>
+            <div class="h-row"><div class="h-label">System</div><div class="h-items"><div class="h-pill" style="background:var(--workflow)">Agentic Workflow &mdash; end-to-end orchestration</div></div></div>
+        </div>
+    </div>
+
+    <!-- Use Cases Matrix -->
+    <div class="section" id="usecases">
+        <div class="section-header">
+            <div class="section-title">Role-Based Use Cases <a class="anchor-link" href="#usecases">#</a></div>
+            <div class="section-subtitle">How each AI concept applies day-to-day — concrete examples for four core personas.</div>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr><th>Concept</th><th>Product Manager</th><th>Analyst</th><th>Data Engineer</th><th>ML Engineer</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td><div class="concept-cell"><div class="concept-dot" style="background:var(--llm)"></div><span class="concept-name">LLM</span></div></td>
+                        <td><div class="use-case-text">Draft PRDs, rewrite specs for different audiences, summarize stakeholder interviews, generate user story variations.</div><div class="use-case-example">"Rewrite this PRD as a 3-bullet executive summary for a non-technical VP."</div></td>
+                        <td><div class="use-case-text">Explain query results in plain language, draft insight narratives for dashboards, summarize trends across data pulls.</div><div class="use-case-example">"Explain why MAU dropped 8% last month in plain language for a business review."</div></td>
+                        <td><div class="use-case-text">Generate boilerplate code, explain cryptic error messages, translate requirements into schema designs, write documentation.</div><div class="use-case-example">"Explain this Airflow DAG error and suggest a fix."</div></td>
+                        <td><div class="use-case-text">Understand research papers, draft experiment proposals, explain model outputs in business terms, get code suggestions while prototyping.</div><div class="use-case-example">"Explain the trade-offs between GBDT and neural nets for a listing ranking problem."</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="concept-cell"><div class="concept-dot" style="background:var(--cli)"></div><span class="concept-name">CLI</span></div></td>
+                        <td><div class="use-case-text">Use Claude Code to explore a codebase during technical planning, generate documents from templates, automate repetitive writing tasks.</div><div class="use-case-example">Run Claude Code to turn a folder of meeting notes into a structured roadmap doc.</div></td>
+                        <td><div class="use-case-text">Interactively explore and transform local data files, generate and iterate on SQL queries, automate report generation without leaving the terminal.</div><div class="use-case-example">Use Claude Code to read a CSV export, clean it, and generate a chart-ready summary script.</div></td>
+                        <td><div class="use-case-text">Generate, refactor, debug, and test pipeline code directly with AI assistance acting on your actual local codebase.</div><div class="use-case-example">Use Claude Code to refactor a dbt model and run the test suite to confirm correctness.</div></td>
+                        <td><div class="use-case-text">Prototype models, write and debug training scripts, iterate on feature engineering, get real-time feedback inside your dev environment.</div><div class="use-case-example">Use Claude Code to write a PyTorch training loop and fix shape mismatches as they surface.</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="concept-cell"><div class="concept-dot" style="background:var(--mcp)"></div><span class="concept-name">MCP</span></div></td>
+                        <td><div class="use-case-text">Connect Claude to Jira to pull sprint data and generate status updates; connect to Glean to surface relevant internal docs when drafting strategy.</div><div class="use-case-example">"Summarize all open P0 bugs from our Jira board and draft an executive status update."</div></td>
+                        <td><div class="use-case-text">Use the DataConcierge MCP to discover which canonical tables to use; use the BigQuery MCP to run queries and explore results without leaving the conversation.</div><div class="use-case-example">"What tables should I use for conversion rate analysis? Now query the top 5 markets."</div></td>
+                        <td><div class="use-case-text">Connect to DataHub or dbt Cloud MCP servers to inspect pipeline lineage, schema metadata, and downstream impact during debugging or planning.</div><div class="use-case-example">"Show me all downstream tables affected if I rename a column in visits_daily."</div></td>
+                        <td><div class="use-case-text">Connect to MLflow or experiment tracking MCP servers to analyze run history; use DataHub MCP to understand feature provenance and data freshness.</div><div class="use-case-example">"Compare my last 10 training runs and identify which hyperparameter drove the best F1."</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="concept-cell"><div class="concept-dot" style="background:var(--skill)"></div><span class="concept-name">Skill</span></div></td>
+                        <td><div class="use-case-text">Invoke a <code>/roadmap-draft</code> skill that pulls open Jira epics and structures them into a quarterly plan; use <code>/summarize-pr</code> to get PM-readable PR summaries.</div><div class="use-case-example">/roadmap-draft &rarr; produces a quarterly outline from open epics, grouped by theme.</div></td>
+                        <td><div class="use-case-text">Use a <code>/query-warehouse</code> skill that translates natural language questions to optimized SQL; invoke <code>/anomaly-narrative</code> to explain metric shifts in plain language.</div><div class="use-case-example">/query-warehouse "What was GMS by market last week?" &rarr; returns SQL + results in seconds.</div></td>
+                        <td><div class="use-case-text">Use <code>/generate-dbt-model</code> to scaffold new models from a schema description; invoke <code>/pipeline-health-check</code> to audit DAG quality against team standards.</div><div class="use-case-example">/generate-dbt-model "Daily active buyers from events.visits" &rarr; full SQL + tests + YAML.</div></td>
+                        <td><div class="use-case-text">Invoke <code>/evaluate-model</code> to run standard metrics on a predictions file; use <code>/feature-audit</code> to check for data leakage or distribution drift before training.</div><div class="use-case-example">/evaluate-model &rarr; runs precision/recall/AUC on your CSV and returns a written narrative.</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="concept-cell"><div class="concept-dot" style="background:var(--agent)"></div><span class="concept-name">Agent</span></div></td>
+                        <td><div class="use-case-text">Task an agent to autonomously research a competitive landscape: it pulls from internal Glean docs, searches the web, synthesizes findings, and produces a ready-to-share brief.</div><div class="use-case-example">"Research our top 3 competitors' shipping features and produce a gap analysis doc."</div></td>
+                        <td><div class="use-case-text">Use agents that query BigQuery, identify anomalies, generate hypotheses, and run follow-up queries automatically. Technical analysts also <strong>build</strong> custom agents — e.g. automated metric monitors that trigger and run on a schedule.</div><div class="use-case-example">"Analyze checkout funnel drop-off this week, find the biggest leak, and explain why." / Building: a recurring agent that flags GMS anomalies every morning.</div></td>
+                        <td><div class="use-case-text">Run an agent that monitors pipeline health, detects failures, reads logs to identify root causes, and either auto-fixes known issues or drafts a remediation plan.</div><div class="use-case-example">"Audit my Airflow DAGs for failures in the last 24h and propose fixes for each."</div></td>
+                        <td><div class="use-case-text">Run an agent that trains multiple model variants, evaluates them on a holdout set, compares results, and recommends the best configuration with a written justification.</div><div class="use-case-example">"Try 5 feature sets on this ranking model, evaluate offline metrics, recommend the best."</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="concept-cell"><div class="concept-dot" style="background:var(--subagent)"></div><span class="concept-name">Sub-agent</span></div></td>
+                        <td><div class="use-case-text">In a strategy workflow, one sub-agent handles competitive research while another synthesizes internal customer feedback — the orchestrator combines both into a final strategy brief.</div><div class="use-case-example">Sub-agent A pulls Jira themes; Sub-agent B pulls Glean docs; orchestrator merges into roadmap.</div></td>
+                        <td><div class="use-case-text">In a reporting pipeline, a data retrieval sub-agent runs in parallel with a visualization sub-agent — each focused on its specialty, with the orchestrator assembling the final report.</div><div class="use-case-example">Sub-agent A queries BigQuery; Sub-agent B writes chart YAML; orchestrator builds the deck.</div></td>
+                        <td><div class="use-case-text">In a data quality workflow, a schema validation sub-agent runs independently of a freshness-check sub-agent — the orchestrator aggregates findings and decides whether to alert or auto-remediate.</div><div class="use-case-example">Sub-agent A checks schema drift; Sub-agent B checks SLA violations; orchestrator acts.</div></td>
+                        <td><div class="use-case-text">In an AutoML pipeline, a feature engineering sub-agent runs in parallel with a hyperparameter search sub-agent — the orchestrator evaluates both outputs and selects the winning configuration.</div><div class="use-case-example">Sub-agent A generates feature combinations; Sub-agent B runs Optuna; orchestrator picks winner.</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="concept-cell"><div class="concept-dot" style="background:var(--workflow)"></div><span class="concept-name">Agentic Workflow</span></div></td>
+                        <td><div class="use-case-text">A fully automated quarterly planning workflow: pull Jira data &rarr; cluster themes &rarr; research market signals &rarr; draft roadmap &rarr; publish to Confluence &rarr; notify stakeholders for approval.</div><div class="use-case-example">Triggered weekly: produces a "what changed in product priorities" digest with zero manual effort.</div></td>
+                        <td><div class="use-case-text">An end-to-end reporting workflow: query warehouse &rarr; detect anomalies &rarr; generate hypotheses &rarr; run follow-ups &rarr; write narrative &rarr; format report &rarr; distribute to stakeholders.</div><div class="use-case-example">A Monday morning business review deck generated automatically every weekend night.</div></td>
+                        <td><div class="use-case-text">A schema drift response workflow: detect upstream change &rarr; map impacted tables &rarr; propose fixes &rarr; open a GitHub PR &rarr; create Jira ticket assigned to the right owner.</div><div class="use-case-example">Fully automated incident response for data quality: from detection to ticket, no human needed until review.</div></td>
+                        <td><div class="use-case-text">An end-to-end ML delivery workflow: pull training data &rarr; engineer features &rarr; train variants &rarr; evaluate &rarr; select winner &rarr; package &rarr; open deployment PR &rarr; notify for prod approval.</div><div class="use-case-example">A nightly model refresh pipeline requiring only a human "approve for production" step.</div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Engagement Matrix -->
+    <div class="section" id="external">
+        <div class="section-header">
+            <div class="section-title">Role Engagement Matrix <a class="anchor-link" href="#external">#</a></div>
+            <div class="section-subtitle">How deeply each role engages with each AI capability — as a user vs. a builder. MCP and CLI are listed separately since they serve different audiences.</div>
+        </div>
+        <div class="table-wrapper">
+            <table class="eng-table">
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>LLM</th>
+                        <th>Skills (use)</th>
+                        <th>Skills (build)</th>
+                        <th>Agents (use)</th>
+                        <th>Agents (build)</th>
+                        <th>MCP (use)</th>
+                        <th>MCP (build)</th>
+                        <th>CLI (use)</th>
+                        <th>CLI (build)</th>
+                        <th>Agentic Workflows</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Product Managers</td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-low">LOW</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-none">NONE</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-none">NONE</span></td>
+                        <td><span class="badge-eng badge-low">LOW</span></td>
+                        <td><span class="badge-eng badge-none">NONE</span></td>
+                        <td><span class="badge-eng badge-low">LOW</span></td>
+                    </tr>
+                    <tr>
+                        <td>Analysts</td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-low">LOW</span></td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-none">NONE</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-none">NONE</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                    </tr>
+                    <tr>
+                        <td>Data Engineers</td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                    </tr>
+                    <tr>
+                        <td>ML Engineers</td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                    </tr>
+                    <tr>
+                        <td>Product Engineers<div class="small">web, mobile web &amp; app</div></td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-low">LOW</span></td>
+                        <td><span class="badge-eng badge-low">LOW</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-high">HIGH</span></td>
+                        <td><span class="badge-eng badge-med">MED</span></td>
+                        <td><span class="badge-eng badge-low">LOW</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin:1.25rem 0 0;font-size:0.8rem;align-items:center">
+            <span style="color:var(--text-light);font-weight:600">Legend:</span>
+            <span class="badge-eng badge-high">HIGH</span>
+            <span class="badge-eng badge-med">MED</span>
+            <span class="badge-eng badge-low">LOW</span>
+            <span class="badge-eng badge-none">NONE</span>
+        </div>
+    </div>
+
+</div><!-- end tab1 -->
+
+<footer>
+    <p>Agentic Analytics Dashboard &nbsp;&bull;&nbsp; Built with <strong>Claude Code</strong> &nbsp;&bull;&nbsp; March 2026</p>
+    <p style="margin-top:0.5rem;opacity:0.6">For questions or additions, reach out to the AI Platform team.</p>
+</footer>
+
+<script>
+function copyShareLink(btn) {
+    var url = window.location.href;
+    navigator.clipboard.writeText(url).then(function() {
+        btn.classList.add('copied');
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+        setTimeout(function() {
+            btn.classList.remove('copied');
+            btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share';
+        }, 2000);
+    });
+}
+</script>
+</body>
+</html>
